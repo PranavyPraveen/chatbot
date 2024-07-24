@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salary Predictor</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-image: linear-gradient(to bottom, #4CAF50, #0B6623); /* Gradient Background */
+            color: white;
+        }
+        .navbar {
+            background-color: #333; /* Navbar Background */
+        }
+        #predicted-value {
+            margin-top: 20px;
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <a class="navbar-brand" href="#">Salary Predictor</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'home' %}">Back to Chatbot</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <form id="prediction-form" method="post" action="{% url 'ppage' %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="job-roles">Job Roles</label>
+                    <select class="form-control" id="job-roles" name="job">
+                        <option selected value="{{sjob}}">{{sjob}}</option>
+                        {% for i in jr %}
+                        <option value="{{i}}">{{i}}</option>
+                        {% endfor %}
+                        <!-- Add options dynamically if needed -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="status">Employment Type</label>
+                    <select class="form-control" id="status" name="type">
+                        <option selected value="{{stype}}">{{stype}}</option>
+                        {% for i in type %}
+                        <option value="{{i}}">{{i}}</option>
+                        {% endfor %}
+                        <!-- Add options dynamically if needed -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="status">Experience Level</label>
+                    <select class="form-control" id="statmus" name="exp">
+                        <option selected value="{{sexp}}">{{sexp}}</option>
+                        {% for i in exp %}
+                        <option value="{{i}}">{{i}}</option>
+                        {% endfor %}
+                        <!-- Add options dynamically if needed -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="status">Company Size</label>
+                    <select class="form-control" id="statms" name="size">
+                        <option selected value="{{ssize}}">{{ssize}}</option>
+                        {% for i in size %}
+                        <option value="{{i}}">{{i}}</option>
+                        {% endfor %}
+                        <!-- Add options dynamically if needed -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="location">Location</label>
+                    <select class="form-control" id="location" name="loc">
+                        <option selected value="{{sloc}}">{{sloc}}</option>
+                        {% for i in loc %}
+                        <option value="{{i}}">{{i}}</option>
+                        {% endfor %}
+                        <!-- Add options dynamically if needed -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="location">Year</label>
+                    <input type="number" id="yearInput" name="year" min="1900" max="2100" placeholder="YYYY" value="{{sy}}" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Predict</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-6">
+    <div class="row">
+        <div class="col-md-6 offset-md-2">
+            {% if  result != "" %}
+            <div id="predicted-value">₹ {{result}}</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+  // Get the input element
+  var yearInput = document.getElementById('yearInput');
+
+  // Add event listener for input change
+  yearInput.addEventListener('input', function() {
+    // Get the current value of the input
+    var yearValue = yearInput.value;
+
+    // Check if the length exceeds 4 characters
+    if (yearValue.length > 4) {
+      // Trim the input to 4 characters
+      yearInput.value = yearValue.slice(0, 4);
+    }
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Template</title>
+        <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url('https://www.transparenttextures.com/patterns/whatsapp-chat-background.png');
+            color: #000; /* Change text color to black for better readability */
+        }
+
+        .navbar {
+            background-color: #075e54;
+            color: #fff;
+            padding: 10px 20px;
+        }
+
+        .navbar-brand {
+            font-size: 24px;
+            color: #fff;
+        }
+
+        .chatbot {
+            max-width: 1200px;
+            margin: 20px auto;
+            background-color: #f2f2f2;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background-color: #075e54;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .chat-messages {
+            padding: 10px;
+            overflow-y: auto;
+            max-height: 300px;
+        }
+
+        .message {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            word-wrap: break-word; /* Allow long words to break and wrap */
+            clear: both;
+        }
+
+        .message.sent {
+            background-color: #DCF8C6;
+            float: right;
+        }
+
+        .message.received {
+            background-color: #E5E5EA;
+            float: left;
+        }
+
+        .message.sent p, .message.received p {
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .chat-input {
+            padding: 10px;
+            border-top: 1px solid #ccc;
+            background-color: #fff;
+            overflow: hidden; /* Added to contain floated elements */
+            display: flex; /* Added to align input and button horizontally */
+        }
+
+        .input-field {
+            flex: 1; /* Take up remaining space */
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            outline: none;
+        }
+
+        .send-btn {
+            width: 60px;
+            height: 40px;
+            border: none;
+            background-color: #075e54;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+            outline: none;
+        }
+
+        .chatbot-avatar {
+            width: 80px;
+            background-image: url('');
+            background-size: cover;
+            border-radius: 50%;
+            margin-right: 10px;
+            float: left;
+        }
+
+        .intro-message {
+            padding: 20px;
+            border-bottom: 1px solid #ccc;
+            background-color: #DCF8C6;
+            color: #000; /* Change text color to black for better readability */
+            clear: both; /* Added to ensure the intro message starts on a new line */
+        }
+
+        /* Media Query for Mobile Devices */
+        @media only screen and (max-width: 480px) {
+            .chatbot {
+                max-width: 100%;
+            }
+
+            .input-field {
+                width: calc(100% - 70px);
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <span class="navbar-brand">Chatbot</span>
+    <span class="navbar-brand"><a href="{% url 'ppage' %}"><button>Predict</button></a></span>
+</div>
+
+<div class="chatbot">
+    <div class="chat-header">Chat Bot</div>
+    <div class="chat-messages" id="chatMessages">
+        <div class="message received">
+            <div class="chatbot-avatar"></div>
+            <p>Welcome to our Chatbot!</p>
+        </div>
+        <div class="message received">
+            <div class="chatbot-avatar"></div>
+            <p>Ask me anything.</p>
+        </div>
+    </div>
+    <div class="chat-input">
+        <input type="text" class="input-field" id="messageInput" placeholder="Type a message..." autofocus>
+        <button class="send-btn" onclick="sendMessage()">Send</button>
+    </div>
+</div>
+
+<script>
+    function sendMessage() {
+        var messageInput = document.getElementById("messageInput");
+        var messageText = messageInput.value.trim();
+        if (messageText === "") return;
+
+        var chatMessages = document.getElementById("chatMessages");
+
+        var message = document.createElement("div");
+        message.classList.add("message", "sent");
+        message.innerHTML = "<p>" + messageText + "</p>";
+
+        chatMessages.appendChild(message);
+
+        // Send message to Django backend
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "{% url 'chatbot_resp' %}", true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    var responseData = JSON.parse(xhr.responseText);
+                    var botResponse = responseData.message;
+                    displayBotResponse(botResponse);
+                } else {
+                    console.error('Error:', xhr.status);
+                }
+            }
+        };
+        xhr.send(JSON.stringify({ message: messageText }));
+
+        // Clear input field
+        messageInput.value = "";
+
+        // Scroll to the bottom
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function displayBotResponse(responseText) {
+        var chatMessages = document.getElementById("chatMessages");
+        var chatbotResponse = document.createElement("div");
+        chatbotResponse.classList.add("message", "received");
+        chatbotResponse.innerHTML = `
+            <div class="chatbot-avatar"><img src="https://cdn3.iconfinder.com/data/icons/chat-bot-emoji-blue-filled-color/300/14134081Untitled-3-4096.png" height="36px" width="35px" alt="no image"></div>
+            <p>Bot : ${responseText}</p>
+        `;
+        chatMessages.appendChild(chatbotResponse);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+</script>
+
+</body>
+</html>
